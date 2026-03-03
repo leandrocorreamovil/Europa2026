@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Europa 2026"/>
+<title>🌍 Europa 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Segoe UI',sans-serif;background:#f5f6fa;max-width:480px;margin:0 auto;min-height:100vh;}
+.header{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);color:#fff;padding:14px 18px 10px;position:sticky;top:0;z-index:100;}
+.header-inner{display:flex;align-items:center;gap:10px;}
+.header-title{font-weight:700;font-size:17px;}
+.header-sub{font-size:11px;opacity:.8;}
+.header-count{margin-left:auto;text-align:right;}
+.header-num{font-size:22px;font-weight:800;color:#f39c12;}
+.header-numlabel{font-size:10px;opacity:.8;}
+.content{padding-bottom:80px;}
+.banner{background:linear-gradient(135deg,#f39c12,#e74c3c);color:#fff;padding:20px;text-align:center;}
+.banner-num{font-size:48px;font-weight:900;}
+.banner-label{font-size:14px;opacity:.9;}
+.banner-sub{font-size:12px;margin-top:4px;opacity:.8;}
+.section-title{padding:16px 16px 8px;font-weight:700;font-size:14px;color:#555;}
+.cities{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 16px;}
+.city-chip{background:#fff;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);cursor:pointer;}
+.city-chip span{font-size:13px;font-weight:600;}
+.stats{padding:0 16px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.stat-card{background:#fff;border-radius:12px;padding:12px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.07);}
+.stat-ic{font-size:22px;}
+.stat-n{font-size:20px;font-weight:800;color:#2c3e50;}
+.stat-l{font-size:10px;color:#888;}
+.confirmed-list{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px;}
+.conf-item{background:#fff;border-radius:10px;padding:10px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.08);border-left:3px solid #27ae60;font-size:12px;color:#2c3e50;}
+/* Itinerary */
+.day-card{background:#fff;border-radius:12px;padding:14px 16px;margin:0 16px 10px;box-shadow:0 2px 8px rgba(0,0,0,.08);cursor:pointer;display:flex;align-items:center;gap:12px;}
+.day-badge{border-radius:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0;}
+.day-title{font-weight:700;font-size:13px;color:#2c3e50;}
+.day-sub{font-size:11px;color:#888;margin-top:2px;}
+/* Day detail */
+.city-img{width:100%;height:180px;object-fit:cover;}
+.city-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 50%);}
+.city-img-wrap{position:relative;height:180px;overflow:hidden;background:#333;}
+.back-btn{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;z-index:2;}
+.city-img-info{position:absolute;bottom:12px;left:16px;color:#fff;z-index:2;}
+.city-img-title{font-size:20px;font-weight:800;}
+.city-img-date{font-size:13px;opacity:.9;}
+.city-img-hotel{font-size:11px;opacity:.8;margin-top:2px;}
+.ev-card{background:#fff;border-radius:12px;padding:14px 16px;margin:0 16px 10px;box-shadow:0 2px 8px rgba(0,0,0,.07);}
+.ev-inner{display:flex;gap:10px;align-items:flex-start;}
+.ev-ic{font-size:22px;flex-shrink:0;}
+.ev-title{font-weight:700;font-size:13px;color:#2c3e50;}
+.ev-time{font-size:12px;background:#eef2ff;color:#3d5af1;padding:2px 8px;border-radius:6px;font-weight:600;white-space:nowrap;}
+.ev-detail{font-size:12px;color:#666;margin-top:4px;line-height:1.5;}
+.ev-cost{margin-top:6px;display:inline-block;background:#e8f8e8;color:#27ae60;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;}
+.ev-alert{margin-top:4px;display:inline-block;background:#fdecea;color:#e74c3c;font-size:10px;padding:2px 8px;border-radius:6px;margin-left:4px;}
+/* Hotels */
+.hotel-card{background:#fff;border-radius:12px;padding:14px 16px;margin:0 16px 10px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.hotel-name{font-weight:700;font-size:14px;color:#2c3e50;}
+.hotel-city{font-size:12px;color:#e67e22;font-weight:600;margin-top:2px;}
+.hotel-addr{font-size:12px;color:#666;margin-top:4px;}
+.hotel-phone{font-size:12px;color:#3498db;margin-top:2px;}
+/* Costs */
+.cost-row{background:#fff;border-radius:10px;padding:12px 16px;margin:0 16px 8px;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;align-items:center;gap:12px;}
+.cost-city{font-weight:700;font-size:13px;}
+.cost-days{font-size:11px;color:#888;}
+.cost-badge{background:#e8f8e8;color:#27ae60;padding:4px 12px;border-radius:8px;font-weight:700;font-size:13px;margin-left:auto;}
+.cost-total{background:#2c3e50;color:#fff;border-radius:12px;padding:14px 16px;margin:8px 16px;display:flex;justify-content:space-between;align-items:center;}
+.ticket-row{background:#fff;border-radius:10px;padding:10px 14px;margin:0 16px 8px;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;justify-content:space-between;align-items:center;}
+.ticket-name{font-weight:600;font-size:12px;}
+.ticket-url{font-size:11px;color:#3498db;}
+.ticket-price{color:#e74c3c;font-weight:700;font-size:13px;}
+/* Frases */
+.lang-btns{display:flex;gap:10px;padding:0 16px 16px;}
+.lang-btn{flex:1;padding:10px;border-radius:12px;border:2px solid #ddd;background:#fff;font-weight:700;font-size:13px;cursor:pointer;}
+.tip-box{background:#eaf4ff;border-radius:10px;padding:10px 14px;margin:0 16px 14px;font-size:12px;color:#1a5276;}
+.cat-btn{width:100%;border:none;border-radius:12px;padding:12px 16px;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:13px;color:#fff;margin-bottom:2px;}
+.cat-btn.open{border-radius:12px 12px 0 0;margin-bottom:0;}
+.phrase-list{background:#fff;border-radius:0 0 12px 12px;box-shadow:0 4px 8px rgba(0,0,0,.08);margin:0 16px 10px;overflow:hidden;}
+.phrase-item{padding:12px 16px;border-bottom:1px solid #f0f0f0;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.phrase-item:last-child{border-bottom:none;}
+.phrase-es{font-size:12px;color:#888;}
+.phrase-tr{font-size:14px;font-weight:700;color:#2c3e50;margin-top:2px;}
+.phrase-pron{font-size:11px;font-style:italic;margin-top:2px;}
+.nums-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px;}
+.num-cell{background:#f8f9fa;border-radius:8px;padding:6px 4px;text-align:center;}
+.num-n{font-weight:800;font-size:16px;}
+.num-w{font-size:10px;color:#555;}
+/* Alertas */
+.alert-card{background:#fff;border-radius:12px;padding:14px 16px;margin:0 16px 10px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-left:4px solid #e74c3c;}
+.alert-day{font-size:10px;color:#e74c3c;font-weight:700;margin-bottom:2px;}
+.alert-title{font-weight:700;font-size:13px;}
+.alert-detail{font-size:11px;color:#666;margin-top:3px;line-height:1.4;}
+.alert-time{font-size:11px;color:#3d5af1;margin-top:3px;font-weight:600;}
+.dismiss-btn{background:#eee;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;margin-left:8px;flex-shrink:0;}
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid #eee;display:flex;box-shadow:0 -2px 10px rgba(0,0,0,.1);z-index:100;}
+.nav-btn{flex:1;background:none;border:none;padding:10px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.nav-ic{font-size:20px;}
+.nav-lbl{font-size:9px;}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:#e74c3c;}
+.info-box{background:#fff3cd;border-radius:12px;padding:14px;margin:0 16px 16px;font-size:12px;color:#856404;}
+.pwa-box{background:#f8f9fa;border-radius:12px;padding:14px;margin:0 16px;font-size:12px;color:#666;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <span style="font-size:28px">🌍</span>
+    <div>
+      <div class="header-title">Europa 2026</div>
+      <div class="header-sub">España · Portugal · Italia</div>
+    </div>
+    <div class="header-count">
+      <div class="header-num" id="hcount">-</div>
+      <div class="header-numlabel" id="hlabel">días para el viaje</div>
+    </div>
+  </div>
+</div>
+
+<div class="content" id="content"></div>
+
+<div class="bottom-nav" id="nav"></div>
+
+<script>
+const TRIP_START = new Date("2026-05-02T00:00:00");
+const TABS = [
+  {id:"inicio",ic:"🏠",lbl:"Inicio"},
+  {id:"itinerario",ic:"📅",lbl:"Itinerario"},
+  {id:"hoteles",ic:"🏨",lbl:"Hoteles"},
+  {id:"costos",ic:"💶",lbl:"Costos"},
+  {id:"frases",ic:"💬",lbl:"Frases"},
+  {id:"alertas",ic:"🔔",lbl:"Alertas"},
+];
+
+const CITY_COLORS = {madrid:"#c0392b",toledo:"#8e44ad",cordoba:"#d35400",sevilla:"#e67e22",malaga:"#27ae60",lisboa:"#2980b9",sintra:"#8e44ad",oporto:"#7f2c2c",barcelona:"#1a5276",venecia:"#117a65",florencia:"#b7950b",roma:"#922b21",napoles:"#6e2f1a"};
+const CITY_EMOJI = {madrid:"🇪🇸",toledo:"🏰",cordoba:"🕌",sevilla:"💃",malaga:"🌊",lisboa:"🇵🇹",sintra:"🏯",oporto:"🍷",barcelona:"🏟️",venecia:"🚣",florencia:"🎨",roma:"🏛️",napoles:"🍕"};
+const CITY_IMGS = {
+  madrid:"https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80",
+  toledo:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
+  cordoba:"https://images.unsplash.com/photo-1566632145702-fc8e1e3b7ebb?w=600&q=80",
+  sevilla:"https://images.unsplash.com/photo-1555993539-1732b0258235?w=600&q=80",
+  malaga:"https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=600&q=80",
+  lisboa:"https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80",
+  sintra:"https://images.unsplash.com/photo-1610549116814-8b02025523cb?w=600&q=80",
+  oporto:"https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&q=80",
+  barcelona:"https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=80",
+  venecia:"https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=600&q=80",
+  florencia:"https://images.unsplash.com/photo-1543429776-2782fc8e4c7f?w=600&q=80",
+  roma:"https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=600&q=80",
+  napoles:"https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=600&q=80",
+};
+
+const ITINERARY = [
+  {day:0,date:"2026-05-02",label:"Día 0 — Salida desde Córdoba (ARG)",city:"madrid",hotel:null,events:[
+    {time:"",type:"✈️",title:"Vuelo LATAM vía SCL",detail:"Salida desde Córdoba, Argentina hacia Madrid",cost:null,alert:true}]},
+  {day:1,date:"2026-05-03",label:"Día 1 — Llegada a Madrid",city:"madrid",hotel:"Petit Palace Arenal — Calle del Arenal, 16",events:[
+    {time:"11:30",type:"✈️",title:"Llegada Aeropuerto Barajas",detail:"Metro L8 (4,50€) | Aerobús (5€) | Taxi fijo M30 (33€) | Uber (~23€)",cost:"4,50–33€",alert:true},
+    {time:"14:00",type:"🏨",title:"Check-in Petit Palace Arenal",detail:"Calle del Arenal, 16, Madrid",cost:null,alert:true},
+    {time:"15:30",type:"🚶",title:"Puerta del Sol / Plaza Mayor",detail:"Primer paseo por el centro histórico",cost:"Gratis",alert:false}]},
+  {day:2,date:"2026-05-04",label:"Día 2 — Madrid & Toledo",city:"toledo",hotel:"Petit Palace Arenal — Madrid",events:[
+    {time:"09:00",type:"🚕",title:"Taxi a Estación Atocha",detail:"Para tomar el tren a Toledo",cost:"~10€",alert:true},
+    {time:"10:15",type:"🚆",title:"Tren a Toledo ✅ CONFIRMADO",detail:"Salida 10:15 h — Llegada 10:50 h",cost:"~22,20€ ida/vuelta",alert:true},
+    {time:"11:15",type:"🏰",title:"Tour Toledo (~4 horas)",detail:"Alcázar · Plaza Zocodover · Catedral · Barrio Judío · Mezquita Cristo de la Luz · Puente de Alcántara",cost:"Pulsera Turística 12€ (recomendado)",alert:false},
+    {time:"14:30",type:"⛪",title:"Entrada Catedral Toledo ✅ COMPRADA",detail:"Entrada anticipada confirmada",cost:"Incluido",alert:true},
+    {time:"16:25",type:"🚆",title:"Tren regreso Madrid ✅ CONFIRMADO",detail:"Salida desde Toledo 16:25 h",cost:"Incluido",alert:true},
+    {time:"17:30",type:"🏨",title:"Llegada al hotel",detail:"Metro L1 desde Atocha a Sol (4 paradas)",cost:"~1,50€",alert:false},
+    {time:"18:15",type:"🌳",title:"Retiro · Salamanca · Gran Vía",detail:"Puerta de Alcalá → Retiro → Serrano → Cibeles → Gran Vía",cost:"Gratis",alert:false}]},
+  {day:3,date:"2026-05-05",label:"Día 3 — Madrid → Córdoba → Sevilla",city:"sevilla",hotel:"Hotel Eurostars Regina — C. San Vicente, 97",events:[
+    {time:"09:00",type:"🚕",title:"Taxi a Estación Atocha",detail:"Salida del hotel ~9:00 h",cost:"~10€",alert:true},
+    {time:"09:55",type:"🚆",title:"Tren Madrid→Córdoba ✅ CONFIRMADO",detail:"OUIGO 09:55 h — Llegada Córdoba 11:40 h",cost:"Confirmado",alert:true},
+    {time:"11:40",type:"🧳",title:"Consigna de equipaje — Córdoba",detail:"Estación Autobuses José Anguita (frente a tren). Alt: LockHereNow / Bag in Box",cost:"~4–6€",alert:true},
+    {time:"12:00",type:"🕌",title:"Recorrido Córdoba (~4 horas)",detail:"Mezquita-Catedral (13€) → Judería (gratis) → Alcázar (5€) → Puente Romano (gratis)",cost:"~18€",alert:false},
+    {time:"19:00",type:"🚆",title:"Tren Córdoba→Sevilla ✅ CONFIRMADO",detail:"Salida 19:00 h — Llegada Sevilla 20:00 h",cost:"Confirmado",alert:true},
+    {time:"20:30",type:"🏨",title:"Check-in Eurostars Regina",detail:"C. San Vicente, 97 — Tel: +34 954 90 75 75",cost:null,alert:true}]},
+  {day:4,date:"2026-05-06",label:"Día 4 — Sevilla",city:"sevilla",hotel:"Hotel Eurostars Regina — Sevilla",events:[
+    {time:"09:00",type:"⛪",title:"Catedral de Sevilla + Giralda",detail:"La catedral gótica más grande del mundo. Comprar online.",cost:"18€ + 1€ gestión",alert:true},
+    {time:"10:30",type:"🏰",title:"Real Alcázar de Sevilla",detail:"Palacio más antiguo de Europa en uso. Game of Thrones. Comprar online.",cost:"15,50€",alert:true},
+    {time:"14:00",type:"🌞",title:"Tarde libre en Sevilla",detail:"Barrio Santa Cruz · Plaza de España · Triana · tapas",cost:"Variable",alert:false}]},
+  {day:5,date:"2026-05-07",label:"Día 5 — Sevilla → Málaga",city:"malaga",hotel:"Hotel Don Curro — C. Sancha de Lara, 9",events:[
+    {time:"10:35",type:"🚆",title:"Tren Sevilla→Málaga ✅ CONFIRMADO",detail:"Avant 10:35 h — Llegada Málaga 12:45 h",cost:"Confirmado",alert:true},
+    {time:"13:00",type:"🏨",title:"Check-in Hotel Don Curro",detail:"C. Sancha de Lara, 9 — Tel: +34 952 22 72 00",cost:null,alert:true},
+    {time:"14:00",type:"🏰",title:"Castillo de Gibralfaro ⚠️ Cierra 17:00",detail:"Vistas panorámicas. Bus 35 desde Alameda Principal.",cost:"3,50€ (combinada: 6,50€)",alert:true},
+    {time:"16:00",type:"🏯",title:"Alcazaba de Málaga",detail:"Palacio árabe. Abre hasta las 20:00 h",cost:"4€",alert:false},
+    {time:"17:30",type:"⛪",title:"Catedral de Málaga",detail:"La Manquita — torre inacabada. Hasta las 20:00 h",cost:"12€",alert:false},
+    {time:"19:30",type:"🌊",title:"Calle Larios + Muelle Uno",detail:"Paseo por la calle más famosa y el puerto moderno",cost:"Gratis",alert:false}]},
+  {day:6,date:"2026-05-08",label:"Día 6 — Nerja y Frigiliana",city:"malaga",hotel:"Hotel Don Curro — Málaga",events:[
+    {time:"08:00",type:"🚌",title:"Bus Málaga→Nerja (ALSA)",detail:"Desde Estación de Autobuses. ~1h30min",cost:"5–8€",alert:true},
+    {time:"09:30",type:"🌅",title:"Balcón de Europa — Nerja",detail:"El mirador más famoso de la Costa del Sol",cost:"Gratis",alert:false},
+    {time:"11:30",type:"🚌",title:"Bus Nerja→Frigiliana (Grupo Fajardo)",detail:"Desde Avda. Pescia. ~15 min",cost:"1,20€",alert:true},
+    {time:"12:00",type:"🏘️",title:"Frigiliana",detail:"Pueblo blanco andaluz — calles encaladas y herencia morisca",cost:"Gratis",alert:false},
+    {time:"16:00",type:"🚌",title:"Bus regreso Nerja→Málaga (ALSA)",detail:"Bus directo de vuelta",cost:"5–8€",alert:true}]},
+  {day:7,date:"2026-05-09",label:"Día 7 — Málaga → Lisboa",city:"lisboa",hotel:"Hotel INN Rossio — R. 1º de Dezembro 73",events:[
+    {time:"08:00",type:"🚕",title:"Taxi al Aeropuerto de Málaga",detail:"Salida temprana hacia AGP",cost:"~15€",alert:true},
+    {time:"",type:"✈️",title:"Vuelo Málaga→Lisboa ✅ CONFIRMADO",detail:"AGP → LIS",cost:"Confirmado",alert:true},
+    {time:"13:00",type:"🏨",title:"Check-in Hotel INN Rossio",detail:"R. 1º de Dezembro 73 — Tel: +351 21 347 4976",cost:null,alert:true},
+    {time:"15:00",type:"🚃",title:"Tranvía 28",detail:"Recorrido histórico Alfama → Chiado. ~1 hora",cost:"3,10€ (pase 24h: 7€)",alert:false},
+    {time:"16:30",type:"🏘️",title:"Barrio Alfama + Mirador Sta. Lucía",detail:"Laberinto de calles · fado · vistas al Tajo",cost:"Gratis",alert:false}]},
+  {day:8,date:"2026-05-10",label:"Día 8 — Lisboa / Sintra",city:"sintra",hotel:"Hotel INN Rossio — Lisboa",events:[
+    {time:"08:30",type:"🎫",title:"Excursión Sintra ✅ COMPRADA (Booking)",detail:"Salida 08:30 h. Tour confirmado.",cost:"Confirmado",alert:true},
+    {time:"09:30",type:"🏯",title:"Palácio da Pena y Parque",detail:"El más famoso de Sintra. Arquitectura colorida.",cost:"~20€",alert:false},
+    {time:"11:30",type:"🏰",title:"Castelo dos Mouros",detail:"Castillo árabe con vistas impresionantes",cost:"~12€",alert:false},
+    {time:"14:00",type:"🌿",title:"Quinta da Regaleira",detail:"Pozo iniciático y jardines místicos",cost:"~20€",alert:false},
+    {time:"17:00",type:"🏛️",title:"Centro histórico de Sintra",detail:"Palacio Nacional y calles encantadoras",cost:"~13€",alert:false}]},
+  {day:9,date:"2026-05-11",label:"Día 9 — Lisboa → Oporto",city:"oporto",hotel:"Hotel Chic&Basic Gravity — R. Das Oliveiras 48",events:[
+    {time:"09:00",type:"🚆",title:"Tren Lisboa→Oporto (Alfa Pendular)",detail:"Desde Sta. Apolónia u Oriente. ~2h30. Llega Porto Campanhã.",cost:"~15–25€",alert:true},
+    {time:"12:00",type:"🏨",title:"Check-in Chic&Basic Gravity",detail:"R. Das Oliveiras 48 — Tel: +351 22 976 6740",cost:null,alert:true},
+    {time:"14:00",type:"🚶",title:"Tarde libre en Oporto",detail:"Exploración libre de la Ribeira",cost:"Gratis",alert:false}]},
+  {day:10,date:"2026-05-12",label:"Día 10 — Oporto",city:"oporto",hotel:"Hotel Chic&Basic Gravity — Oporto",events:[
+    {time:"09:00",type:"🚉",title:"Estación São Bento",detail:"~20.000 azulejos pintados a mano",cost:"Gratis",alert:false},
+    {time:"09:30",type:"📚",title:"Librería Lello ⚠️ Comprar online",detail:"Escalera en espiral roja. Inspiró a J.K. Rowling.",cost:"10€",alert:true},
+    {time:"11:00",type:"🗼",title:"Torre de los Clérigos",detail:"240 escalones. Vista 360° de Oporto.",cost:"10€",alert:false},
+    {time:"13:00",type:"🏛️",title:"Palacio de la Bolsa",detail:"Visita guiada obligatoria",cost:"14€",alert:false},
+    {time:"15:00",type:"🌊",title:"Barrio de la Ribeira",detail:"Casas coloridas junto al río Duero",cost:"Gratis",alert:false},
+    {time:"17:00",type:"🌉",title:"Puente Don Luis I → Vila Nova de Gaia",detail:"Cruzar a pie. Vistas al atardecer.",cost:"Gratis",alert:false},
+    {time:"18:00",type:"🍷",title:"Cata de vino de Oporto",detail:"Bodegas Taylor's o Cockburn's",cost:"~20€",alert:false}]},
+  {day:11,date:"2026-05-13",label:"Día 11 — Oporto → Barcelona",city:"barcelona",hotel:"Hotel SM Teatre Auditori — C. de Ribes, 71",events:[
+    {time:"08:00",type:"🚕",title:"Taxi al Aeropuerto de Oporto",detail:"OPO → BCN",cost:"~20€",alert:true},
+    {time:"",type:"✈️",title:"Vuelo Oporto→Barcelona ✅ CONFIRMADO",detail:"Ver detalles del vuelo",cost:"Confirmado",alert:true},
+    {time:"13:00",type:"🏨",title:"Check-in SM Teatre Auditori",detail:"C. de Ribes 71, Eixample — Tel: +34 932 45 64 85",cost:null,alert:true},
+    {time:"15:00",type:"🛍️",title:"Las Ramblas + Mercado Boquería",detail:"La avenida más famosa de Barcelona",cost:"Gratis",alert:false},
+    {time:"16:30",type:"⛪",title:"Barrio Gótico",detail:"Calles medievales · Catedral de Barcelona",cost:"Gratis–4€",alert:false},
+    {time:"18:30",type:"🏖️",title:"Playa de la Barceloneta",detail:"Breve paseo junto al Mediterráneo",cost:"Gratis",alert:false}]},
+  {day:12,date:"2026-05-14",label:"Día 12 — Barcelona: Gaudí",city:"barcelona",hotel:"Hotel SM Teatre Auditori — Barcelona",events:[
+    {time:"09:00",type:"⛪",title:"Sagrada Família ⚠️ COMPRAR ONLINE",detail:"Obra maestra de Gaudí. 1,5–2 hs.",cost:"Desde 40€",alert:true},
+    {time:"11:30",type:"🌳",title:"Park Güell ⚠️ COMPRAR ONLINE",detail:"Mosaicos · terrazas · vistas de BCN",cost:"~18€",alert:true},
+    {time:"14:30",type:"🏙️",title:"Paseo de Gracia",detail:"Casa Batlló y La Pedrera (exterior gratis)",cost:"Gratis (exterior)",alert:false},
+    {time:"20:00",type:"⛲",title:"Fuentes de Montjuïc (opcional)",detail:"Verificar horarios de temporada",cost:"Gratis",alert:false}]},
+  {day:13,date:"2026-05-15",label:"Día 13 — Barcelona → Venecia",city:"venecia",hotel:"Hotel Centauro — Campo Manin 4297",events:[
+    {time:"08:00",type:"🚕",title:"Taxi al Aeropuerto Barcelona",detail:"BCN → VCE",cost:"~30€",alert:true},
+    {time:"",type:"✈️",title:"Vuelo Barcelona→Venecia ✅ CONFIRMADO",detail:"~1h50 min. Aeropuerto Marco Polo (VCE)",cost:"Confirmado",alert:true},
+    {time:"13:00",type:"🚢",title:"Traslado aeropuerto→hotel",detail:"Alilaguna Línea Naranja hasta Rialto (~1h, 15€) o Bus+Vaporetto (~10€)",cost:"10–15€",alert:true},
+    {time:"15:00",type:"🏨",title:"Check-in Hotel Centauro",detail:"Campo Manin 4297 — Tel: +39 041 522 5832",cost:null,alert:true},
+    {time:"16:00",type:"⛪",title:"Plaza y Basílica San Marcos",detail:"El salón más bello del mundo. Basílica gratis.",cost:"Gratis–7€",alert:false},
+    {time:"17:30",type:"🗼",title:"Campanile de San Marcos",detail:"Vistas panorámicas de la laguna",cost:"10€",alert:false},
+    {time:"18:30",type:"🚣",title:"Góndola (opcional)",detail:"Tarifa oficial diurna: 80€/góndola",cost:"~80€",alert:false}]},
+  {day:14,date:"2026-05-16",label:"Día 14 — Venecia",city:"venecia",hotel:"Hotel Centauro — Venecia",events:[
+    {time:"09:00",type:"🏛️",title:"Palacio Ducal",detail:"Incluye cruce por el Puente de los Suspiros",cost:"~25€",alert:true},
+    {time:"11:30",type:"🌉",title:"Puente de Rialto + Mercado",detail:"El puente más antiguo del Gran Canal",cost:"Gratis",alert:false},
+    {time:"14:00",type:"🎨",title:"Galería de la Academia o Guggenheim",detail:"Academia (arte clásico) o Peggy Guggenheim (arte moderno)",cost:"18–20€",alert:false},
+    {time:"17:00",type:"🏘️",title:"Barrio Cannaregio o Dorsoduro",detail:"Barrios auténticos alejados de las multitudes",cost:"Gratis",alert:false},
+    {time:"18:30",type:"⛪",title:"Sta. Maria della Salute",detail:"Joya arquitectónica con vistas al Gran Canal",cost:"Gratis",alert:false}]},
+  {day:15,date:"2026-05-17",label:"Día 15 — Venecia → Florencia",city:"florencia",hotel:"Hotel Adler Cavalieri — Via della Scala 40",events:[
+    {time:"09:00",type:"🚢",title:"Vaporetto L2 → Estación Sta. Lucía",detail:"Desde parada Rialto. ~15-20 min.",cost:"~10€",alert:true},
+    {time:"10:30",type:"🚆",title:"Tren Venecia→Florencia ✅ CONFIRMADO",detail:"Frecciarossa/Italo. Venezia S. Lucia → Firenze SMN. ~2 hs.",cost:"Confirmado",alert:true},
+    {time:"13:00",type:"🏨",title:"Check-in Hotel Adler Cavalieri",detail:"Via della Scala 40 — Tel: +39 055 277810",cost:null,alert:true},
+    {time:"15:00",type:"⛪",title:"Complejo del Duomo",detail:"Catedral (gratis) + Cúpula Brunelleschi + Campanario Giotto",cost:"~20€ (paquete Duomo)",alert:false},
+    {time:"17:30",type:"🌉",title:"Ponte Vecchio",detail:"El puente más antiguo de Florencia. Joyerías.",cost:"Gratis",alert:false}]},
+  {day:16,date:"2026-05-18",label:"Día 16 — Florencia: Arte",city:"florencia",hotel:"Hotel Adler Cavalieri — Florencia",events:[
+    {time:"09:00",type:"🗿",title:"Galería Academia — David ⚠️ ONLINE",detail:"CERRADO LUNES. Comprar online.",cost:"~16€",alert:true},
+    {time:"11:00",type:"🖼️",title:"Galería Uffizi ⚠️ ONLINE",detail:"Botticelli · Da Vinci · CERRADO LUNES.",cost:"~25€",alert:true},
+    {time:"14:30",type:"🏛️",title:"Piazza della Signoria",detail:"Esculturas al aire libre. Corazón político de Florencia.",cost:"Gratis",alert:false},
+    {time:"16:00",type:"⛪",title:"Basílica de Santa Croce",detail:"Tumbas de Miguel Ángel, Galileo y Maquiavelo",cost:"~8€",alert:false},
+    {time:"18:30",type:"🌅",title:"Piazzale Michelangelo",detail:"La vista más famosa de Florencia al atardecer. Bus 12 o 13.",cost:"Gratis",alert:false}]},
+  {day:17,date:"2026-05-19",label:"Día 17 — Florencia → Roma",city:"roma",hotel:"Crosti Hotel — Via Castelfidardo 54",events:[
+    {time:"09:00",type:"🚕",title:"Taxi a Estación Firenze SMN",detail:"Desde Hotel Adler Cavalieri",cost:"~10€",alert:true},
+    {time:"10:00",type:"🚆",title:"Tren Florencia→Roma ✅ CONFIRMADO",detail:"Frecciarossa. Firenze SMN → Roma Termini. ~1h30.",cost:"Confirmado",alert:true},
+    {time:"12:00",type:"🏨",title:"Check-in Crosti Hotel",detail:"Via Castelfidardo 54 — Tel: +39 06 446 8597",cost:null,alert:true},
+    {time:"14:00",type:"🏛️",title:"Coliseo ⚠️ COMPRAR ONLINE",detail:"La maravilla del mundo antiguo. Llevar gorra y agua.",cost:"~18€ (incluye Foro y Palatino)",alert:true},
+    {time:"16:00",type:"🏺",title:"Foro Romano y Monte Palatino",detail:"Ruinas del centro político romano",cost:"Incluido",alert:false}]},
+  {day:18,date:"2026-05-20",label:"Día 18 — Roma: Vaticano",city:"roma",hotel:"Crosti Hotel — Roma",events:[
+    {time:"09:00",type:"🎨",title:"Museos Vaticanos + Capilla Sixtina ⚠️",detail:"3–4 horas. RESERVAR CON MUCHA ANTELACIÓN.",cost:"~20€+",alert:true},
+    {time:"13:00",type:"⛪",title:"Basílica de San Pedro",detail:"Gratis. Colas largas. Cúpula de pago.",cost:"Gratis (cúpula ~8€)",alert:false},
+    {time:"15:00",type:"🏛️",title:"Panteón de Agripa",detail:"Templo romano perfectamente conservado",cost:"5€",alert:false},
+    {time:"16:30",type:"💦",title:"Fontana di Trevi",detail:"Lanzar una moneda para volver a Roma",cost:"Gratis",alert:false},
+    {time:"18:00",type:"🌆",title:"Piazza Navona + Plaza de España",detail:"Las plazas más elegantes de Roma",cost:"Gratis",alert:false}]},
+  {day:19,date:"2026-05-21",label:"Día 19 — Roma → Nápoles",city:"napoles",hotel:"B&B Duomo 50 — Via Duomo 50",events:[
+    {time:"09:00",type:"🚕",title:"Taxi a Roma Termini",detail:"Para tomar el tren a Nápoles",cost:"~15€",alert:true},
+    {time:"10:00",type:"🚆",title:"Tren Roma→Nápoles ✅ CONFIRMADO",detail:"Frecciarossa/Italo. Roma Termini → Napoli Centrale. ~1h.",cost:"Confirmado",alert:true},
+    {time:"11:30",type:"🏨",title:"Check-in B&B Duomo 50",detail:"Via Duomo 50, piso 3 — Centro histórico",cost:null,alert:true},
+    {time:"15:00",type:"⛪",title:"Catedral de Nápoles (Duomo)",detail:"Capilla del Tesoro de San Gennaro",cost:"Gratis",alert:false},
+    {time:"16:00",type:"🎨",title:"Capilla Sansevero ⚠️ RESERVAR ONLINE",detail:"Cristo Velado en mármol. Hasta 19:00 h.",cost:"~8€",alert:true},
+    {time:"17:30",type:"🏘️",title:"Spaccanapoli + Via San Gregorio Armeno",detail:"La calle que divide Nápoles. Artesanos.",cost:"Gratis",alert:false},
+    {time:"20:00",type:"🍕",title:"Pizza en Via dei Tribunali",detail:"Sorbillo o Di Matteo. La mejor pizza del mundo.",cost:"~10–15€",alert:false}]},
+  {day:20,date:"2026-05-22",label:"Día 20 — Costa Amalfitana",city:"napoles",hotel:"B&B Duomo 50 — Nápoles",events:[
+    {time:"08:10",type:"🎫",title:"Tour Amalfitana ✅ CONFIRMADO (Booking)",detail:"Salida desde Palazzo Caracciolo Naples",cost:"Confirmado",alert:true},
+    {time:"10:00",type:"🌊",title:"Sorrento",detail:"Golfo de Nápoles · Piazza Tasso",cost:"Incluido",alert:false},
+    {time:"11:30",type:"🎨",title:"Positano",detail:"La Perla de la Costa. Casas de colores.",cost:"Incluido",alert:false},
+    {time:"13:30",type:"⚓",title:"Amalfi",detail:"Catedral San Andrés · Claustro del Paraíso",cost:"Incluido",alert:false},
+    {time:"15:30",type:"🌺",title:"Ravello",detail:"Villa Rufolo · Villa Cimbrone · vistas panorámicas",cost:"Incluido",alert:false},
+    {time:"18:00",type:"🏠",title:"Regreso a Nápoles",detail:"Fin del tour",cost:null,alert:false}]},
+  {day:21,date:"2026-05-23",label:"Día 21 — Nápoles → Madrid",city:"madrid",hotel:"Hotel NH Barajas Airport",events:[
+    {time:"08:00",type:"🚕",title:"Taxi al Aeropuerto de Nápoles (NAP)",detail:"Salida temprana",cost:"~25€",alert:true},
+    {time:"",type:"✈️",title:"Vuelo Nápoles→Madrid ✅ CONFIRMADO",detail:"NAP → MAD",cost:"Confirmado",alert:true},
+    {time:"15:00",type:"🏨",title:"Check-in NH Barajas Airport",detail:"C. Catamarán 1, Barajas — Tel: +34 917 42 02 00",cost:null,alert:true}]},
+  {day:22,date:"2026-05-24",label:"Día 22 — Despedida ✈️",city:"madrid",hotel:null,events:[
+    {time:"09:00",type:"🧳",title:"Check-out + guardar equipaje",detail:"Guardar maletas para explorar Madrid",cost:null,alert:false},
+    {time:"10:00",type:"🚌",title:"Viaje al centro de Madrid",detail:"Metro desde Barajas al centro",cost:"~2€",alert:false},
+    {time:"11:00",type:"🚶",title:"Recorrido final por Madrid",detail:"Últimas fotos · Puerta del Sol · Gran Vía",cost:"Variable",alert:false},
+    {time:"20:00",type:"✈️",title:"Vuelo regreso MAD→COR ✅ CONFIRMADO",detail:"Salida nocturna. LATAM vía SCL.",cost:"Confirmado",alert:true}]}
+];
+
+const HOTELS = [
+  {city:"Madrid",name:"Petit Palace Arenal",addr:"Calle del Arenal, 16",phone:null,days:"Días 1-2"},
+  {city:"Sevilla",name:"Hotel Eurostars Regina",addr:"C. San Vicente, 97",phone:"+34 954 90 75 75",days:"Días 3-4"},
+  {city:"Málaga",name:"Hotel Don Curro",addr:"C. Sancha de Lara, 9",phone:"+34 952 22 72 00",days:"Días 5-6"},
+  {city:"Lisboa",name:"Hotel INN Rossio",addr:"R. 1º de Dezembro 73",phone:"+351 21 347 4976",days:"Días 7-8"},
+  {city:"Oporto",name:"Hotel Chic&Basic Gravity",addr:"R. Das Oliveiras 48",phone:"+351 22 976 6740",days:"Días 9-10"},
+  {city:"Barcelona",name:"Hotel SM Teatre Auditori",addr:"C. de Ribes, 71",phone:"+34 932 45 64 85",days:"Días 11-12"},
+  {city:"Venecia",name:"Hotel Centauro",addr:"Campo Manin, 4297",phone:"+39 041 522 5832",days:"Días 13-14"},
+  {city:"Florencia",name:"Hotel Adler Cavalieri",addr:"Via della Scala, 40",phone:"+39 055 277810",days:"Días 15-16"},
+  {city:"Roma",name:"Crosti Hotel",addr:"Via Castelfidardo, 54",phone:"+39 06 446 8597",days:"Días 17-18"},
+  {city:"Nápoles",name:"B&B Duomo 50",addr:"Via Duomo, 50, piso 3",phone:null,days:"Días 19-20"},
+  {city:"Madrid (regreso)",name:"Hotel NH Barajas Airport",addr:"C. Catamarán, 1",phone:"+34 917 42 02 00",days:"Día 21"},
+];
+
+const COSTS = [
+  {city:"Madrid",days:"Días 1-2",est:"80–120€"},
+  {city:"Toledo",days:"Día 2",est:"20–30€"},
+  {city:"Córdoba",days:"Día 3",est:"20–30€"},
+  {city:"Sevilla",days:"Días 3-4",est:"40–60€"},
+  {city:"Málaga",days:"Días 5-6",est:"30–50€"},
+  {city:"Lisboa",days:"Días 7-8",est:"40–60€"},
+  {city:"Sintra",days:"Día 8",est:"50–70€"},
+  {city:"Oporto",days:"Días 9-10",est:"60–90€"},
+  {city:"Barcelona",days:"Días 11-12",est:"80–120€"},
+  {city:"Venecia",days:"Días 13-14",est:"80–130€"},
+  {city:"Florencia",days:"Días 15-16",est:"70–110€"},
+  {city:"Roma",days:"Días 17-18",est:"60–90€"},
+  {city:"Nápoles",days:"Días 19-20",est:"50–80€"},
+];
+
+const TICKETS = [
+  {name:"Sagrada Família — Barcelona",price:"Desde 40€",url:"sagradafamilia.org"},
+  {name:"Park Güell — Barcelona",price:"~18€",url:"parkguell.barcelona"},
+  {name:"Coliseo — Roma",price:"~18€",url:"ticketing.colosseo.it"},
+  {name:"Museos Vaticanos + Sixtina",price:"~20€+",url:"museivaticani.va"},
+  {name:"Real Alcázar — Sevilla",price:"15,50€",url:"alcazarsevilla.org"},
+  {name:"Catedral — Sevilla",price:"19€",url:"catedraldesevilla.es"},
+  {name:"Galería Uffizi — Florencia",price:"~25€",url:"uffizi.it"},
+  {name:"Palácio da Pena — Sintra",price:"~20€",url:"parquesdesintra.pt"},
+  {name:"Librería Lello — Oporto",price:"~10€",url:"livrarialello.pt"},
+  {name:"Capilla Sansevero — Nápoles",price:"~8€",url:"museosansevero.it"},
+];
+
+const FRASES = {
+  pt:{label:"Português 🇵🇹",color:"#006600",cats:[
+    {cat:"Saludos",items:[
+      {es:"Hola / Buenos días",tr:"Olá / Bom dia",pron:"olá / bom día"},
+      {es:"Buenas tardes / noches",tr:"Boa tarde / Boa noite",pron:"bóa tard / bóa noit"},
+      {es:"Por favor",tr:"Por favor",pron:"por favór"},
+      {es:"Gracias",tr:"Obrigado/a",pron:"obrigádu/a"},
+      {es:"De nada",tr:"De nada",pron:"de náda"},
+      {es:"Disculpe",tr:"Com licença / Desculpe",pron:"kom lisénsa / deshkúlpe"},
+    ]},
+    {cat:"Orientación",items:[
+      {es:"¿Dónde está...?",tr:"Onde fica...?",pron:"ónd fíka"},
+      {es:"¿Cómo llego a...?",tr:"Como chego a...?",pron:"kómu shégu a"},
+      {es:"A la derecha / izquierda",tr:"À direita / À esquerda",pron:"a diréita / a eshkérda"},
+      {es:"Todo recto",tr:"Sempre em frente",pron:"sémpre em frént"},
+      {es:"La estación de tren",tr:"A estação de comboios",pron:"a eshtasáo de kombóyush"},
+      {es:"El aeropuerto",tr:"O aeroporto",pron:"u aeropórtu"},
+      {es:"El hotel",tr:"O hotel",pron:"u otél"},
+    ]},
+    {cat:"Transporte",items:[
+      {es:"Un billete para...",tr:"Um bilhete para...",pron:"um bilyet para"},
+      {es:"¿A qué hora sale?",tr:"A que horas parte?",pron:"a ke órash párt"},
+      {es:"¿Cuánto cuesta?",tr:"Quanto custa?",pron:"kuántu kúshta"},
+      {es:"El metro / autobús",tr:"O metro / o autocarro",pron:"u métru / u autokáru"},
+      {es:"¿Hay wifi?",tr:"Há wifi?",pron:"á uaifai"},
+    ]},
+    {cat:"Restaurante",items:[
+      {es:"Una mesa para dos",tr:"Uma mesa para dois",pron:"úma méza para dóish"},
+      {es:"La carta, por favor",tr:"A ementa, por favor",pron:"a eménta, por favór"},
+      {es:"La cuenta, por favor",tr:"A conta, por favor",pron:"a kónta, por favór"},
+      {es:"¡Está delicioso!",tr:"Está delicioso!",pron:"eshtá delisiózu"},
+      {es:"Agua / Vino / Cerveza",tr:"Água / Vinho / Cerveja",pron:"água / víñu / servéja"},
+    ]},
+    {cat:"Emergencias",items:[
+      {es:"¡Ayuda!",tr:"Socorro!",pron:"sokóru"},
+      {es:"Llame a la policía",tr:"Chame a polícia",pron:"shám a polísya"},
+      {es:"Necesito un médico",tr:"Preciso de um médico",pron:"presízu de um médiku"},
+      {es:"Me robaron",tr:"Fui assaltado/a",pron:"fui asaltádu/a"},
+      {es:"¿Habla español?",tr:"Fala espanhol?",pron:"fála eshpañól"},
+    ]},
+  ],nums:[["1","um"],["2","dois"],["3","três"],["4","quatro"],["5","cinco"],["6","seis"],["7","sete"],["8","oito"],["9","nove"],["10","dez"]]},
+  it:{label:"Italiano 🇮🇹",color:"#009246",cats:[
+    {cat:"Saludos",items:[
+      {es:"Hola / Buenos días",tr:"Ciao / Buongiorno",pron:"cháo / buonyórno"},
+      {es:"Buenas tardes / noches",tr:"Buon pomeriggio / Buonasera",pron:"buon pomeríyo / buonasera"},
+      {es:"Por favor",tr:"Per favore",pron:"per favoré"},
+      {es:"Gracias",tr:"Grazie",pron:"grátzie"},
+      {es:"De nada",tr:"Prego",pron:"prégo"},
+      {es:"Disculpe",tr:"Scusi / Mi scusi",pron:"skúzi / mi skúzi"},
+    ]},
+    {cat:"Orientación",items:[
+      {es:"¿Dónde está...?",tr:"Dov'è...?",pron:"dovè"},
+      {es:"¿Cómo llego a...?",tr:"Come arrivo a...?",pron:"kóme arrívo a"},
+      {es:"A la derecha / izquierda",tr:"A destra / A sinistra",pron:"a déstra / a sinístra"},
+      {es:"Todo recto",tr:"Sempre dritto",pron:"sémpre drítto"},
+      {es:"La estación de tren",tr:"La stazione",pron:"la statsióne"},
+      {es:"El aeropuerto",tr:"L'aeroporto",pron:"laeroporto"},
+      {es:"El hotel",tr:"L'albergo",pron:"lalbergo"},
+    ]},
+    {cat:"Transporte",items:[
+      {es:"Un billete para...",tr:"Un biglietto per...",pron:"un billiétto per"},
+      {es:"¿A qué hora sale?",tr:"A che ora parte?",pron:"a ke óra párte"},
+      {es:"¿Cuánto cuesta?",tr:"Quanto costa?",pron:"kuánto kósta"},
+      {es:"El metro / autobús",tr:"La metro / L'autobus",pron:"la métro / laútobus"},
+      {es:"Validar el billete",tr:"Convalidare il biglietto",pron:"konvalidáre il billiétto"},
+    ]},
+    {cat:"Restaurante",items:[
+      {es:"Una mesa para dos",tr:"Un tavolo per due",pron:"un távolo per dúe"},
+      {es:"La carta, por favor",tr:"Il menù, per favore",pron:"il menú, per favoré"},
+      {es:"La cuenta, por favor",tr:"Il conto, per favore",pron:"il kónto, per favoré"},
+      {es:"¡Está delicioso!",tr:"È squisito! / Che buono!",pron:"è shkuizíto / ke buóno"},
+      {es:"Agua / Vino / Cerveza",tr:"Acqua / Vino / Birra",pron:"ákua / víno / bírra"},
+      {es:"Un café, por favor",tr:"Un caffè, per favore",pron:"un kafé, per favoré"},
+    ]},
+    {cat:"Atracciones",items:[
+      {es:"¿Dónde compro entradas?",tr:"Dove compro i biglietti?",pron:"dóve kómpro i billiétti"},
+      {es:"¿Está incluido?",tr:"È incluso?",pron:"è inklúzo"},
+      {es:"¿Se puede sacar fotos?",tr:"Si possono fare foto?",pron:"si posono fáre fóto"},
+      {es:"¿A qué hora cierra?",tr:"A che ora chiude?",pron:"a ke óra kiúde"},
+      {es:"¿Audioguía en español?",tr:"C'è l'audioguida in spagnolo?",pron:"che laudioguída in spañólo"},
+    ]},
+    {cat:"Emergencias",items:[
+      {es:"¡Ayuda!",tr:"Aiuto!",pron:"aiúto"},
+      {es:"Llame a la policía",tr:"Chiami la polizia",pron:"kiámi la politsía"},
+      {es:"Necesito un médico",tr:"Ho bisogno di un medico",pron:"o bizóño di un médiko"},
+      {es:"Me robaron",tr:"Mi hanno derubato",pron:"mi ánno derubáto"},
+      {es:"¿Habla español?",tr:"Parla spagnolo?",pron:"párla spañólo"},
+    ]},
+  ],nums:[["1","uno"],["2","due"],["3","tre"],["4","quattro"],["5","cinque"],["6","sei"],["7","sette"],["8","otto"],["9","nove"],["10","dieci"]]},
+};
+
+// State
+let curTab = "inicio";
+let selDay = null;
+let dismissed = JSON.parse(localStorage.getItem("dismissed")||"[]");
+let curLang = "pt";
+let openCat = null;
+
+function saveState(){ localStorage.setItem("dismissed", JSON.stringify(dismissed)); }
+
+function countdown(){
+  const now = new Date();
+  const diff = Math.ceil((TRIP_START - now) / 86400000);
+  const el = document.getElementById("hcount");
+  const ll = document.getElementById("hlabel");
+  if(!el) return;
+  if(diff > 0){ el.textContent = diff; ll.textContent = "días para el viaje"; }
+  else if(diff > -22){ el.textContent = "Día "+(Math.abs(diff)); ll.textContent = "¡Estás viajando!"; el.style.color="#2ecc71"; }
+  else { el.textContent = "✓"; ll.textContent = "Viaje completado"; }
+}
+
+function render(){
+  countdown();
+  renderNav();
+  const c = document.getElementById("content");
+  if(curTab==="inicio") c.innerHTML = renderInicio();
+  else if(curTab==="itinerario") c.innerHTML = selDay ? renderDayDetail(selDay) : renderItinerary();
+  else if(curTab==="hoteles") c.innerHTML = renderHoteles();
+  else if(curTab==="costos") c.innerHTML = renderCostos();
+  else if(curTab==="frases") c.innerHTML = renderFrases();
+  else if(curTab==="alertas") c.innerHTML = renderAlertas();
+  bindEvents();
+}
+
+function renderNav(){
+  document.getElementById("nav").innerHTML = TABS.map(t=>`
+    <button class="nav-btn" onclick="goTab('${t.id}')">
+      <span class="nav-ic">${t.ic}</span>
+      <span class="nav-lbl" style="color:${curTab===t.id?'#e74c3c':'#999'};font-weight:${curTab===t.id?700:400}">${t.lbl}</span>
+      ${curTab===t.id?'<div class="nav-dot"></div>':''}
+    </button>`).join("");
+}
+
+function goTab(id){ curTab=id; selDay=null; openCat=null; render(); window.scrollTo(0,0); }
+
+function renderInicio(){
+  const now = new Date();
+  const diff = Math.ceil((TRIP_START - now)/86400000);
+  let banner = diff > 0
+    ? `<div class="banner"><div class="banner-num">${diff}</div><div class="banner-label">días hasta el despegue 🛫</div><div class="banner-sub">2 de mayo 2026 · Córdoba → Madrid</div></div>`
+    : `<div class="banner"><div style="font-size:32px;font-weight:900">¡Estás viajando! 🎉</div></div>`;
+
+  const cities = Object.entries(CITY_EMOJI).map(([k,e])=>`
+    <div class="city-chip" style="border-left:4px solid ${CITY_COLORS[k]}" onclick="goTab('itinerario')">
+      <span style="font-size:20px">${e}</span><span>${k.charAt(0).toUpperCase()+k.slice(1)}</span>
+    </div>`).join("");
+
+  const stats = [["22","Días","📆"],["13","Ciudades","🏙️"],["5","Países","🌍"],["8+","Hoteles","🏨"],["12+","Vuelos/Trenes","🚆"],["50+","Atracciones","🎟️"]]
+    .map(([n,l,i])=>`<div class="stat-card"><div class="stat-ic">${i}</div><div class="stat-n">${n}</div><div class="stat-l">${l}</div></div>`).join("");
+
+  const confirmed = [
+    ["🚆","Tren Madrid↔Toledo (10:15/16:25) — Día 2"],
+    ["🚆","Tren Madrid→Córdoba OUIGO (09:55) — Día 3"],
+    ["🚆","Tren Córdoba→Sevilla (19:00) — Día 3"],
+    ["🚆","Tren Sevilla→Málaga Avant (10:35) — Día 5"],
+    ["✈️","Vuelo Málaga→Lisboa — Día 7"],
+    ["🎫","Excursión Sintra Booking (08:30) — Día 8"],
+    ["🚆","Tren Venecia→Florencia — Día 15"],
+    ["🚆","Tren Florencia→Roma — Día 17"],
+    ["🚆","Tren Roma→Nápoles — Día 19"],
+    ["🎫","Tour Costa Amalfitana Booking (08:10) — Día 20"],
+    ["✈️","Vuelo Nápoles→Madrid — Día 21"],
+    ["✈️","Vuelo regreso MAD→COR (nocturno) — Día 22"],
+  ].map(([i,t])=>`<div class="conf-item"><span style="font-size:18px">${i}</span><span>${t}</span></div>`).join("");
+
+  return `${banner}
+    <div class="section-title">📍 CIUDADES DEL VIAJE</div>
+    <div class="cities">${cities}</div>
+    <div class="section-title">📊 ESTADÍSTICAS</div>
+    <div class="stats">${stats}</div>
+    <div class="section-title">✅ BOLETOS Y TOURS CONFIRMADOS</div>
+    <div class="confirmed-list">${confirmed}</div>`;
+}
+
+function renderItinerary(){
+  return `<div style="padding:16px">
+    <div class="section-title" style="padding:0 0 12px">📅 ITINERARIO COMPLETO</div>
+    ${ITINERARY.map(d=>`
+      <div class="day-card" style="border-left:5px solid ${CITY_COLORS[d.city]||'#555'}" onclick="openDay(${d.day})">
+        <div class="day-badge" style="background:${CITY_COLORS[d.city]||'#555'}">${d.day}</div>
+        <div style="flex:1">
+          <div class="day-title">${d.label}</div>
+          <div class="day-sub">${d.date} · ${d.events.length} eventos</div>
+        </div>
+        <span style="font-size:18px">${CITY_EMOJI[d.city]||''}</span>
+      </div>`).join("")}
+  </div>`;
+}
+
+function openDay(n){ selDay = ITINERARY.find(d=>d.day===n); render(); window.scrollTo(0,0); }
+
+function renderDayDetail(d){
+  const col = CITY_COLORS[d.city]||"#555";
+  const img = CITY_IMGS[d.city]||"";
+  const events = d.events.map(ev=>`
+    <div class="ev-card" style="border-left:4px solid ${ev.alert?'#e74c3c':'#ecf0f1'}">
+      <div class="ev-inner">
+        <span class="ev-ic">${ev.type}</span>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span class="ev-title">${ev.title}</span>
+            ${ev.time?`<span class="ev-time">${ev.time}</span>`:''}
+          </div>
+          <div class="ev-detail">${ev.detail}</div>
+          ${ev.cost?`<span class="ev-cost">💶 ${ev.cost}</span>`:''}
+          ${ev.alert?`<span class="ev-alert">⚠️ Reservar con anticipación</span>`:''}
+        </div>
+      </div>
+    </div>`).join("");
+
+  return `
+    <div class="city-img-wrap">
+      <img class="city-img" src="${img}" onerror="this.style.display='none'" alt="${d.city}"/>
+      <div class="city-img-overlay"></div>
+      <button class="back-btn" onclick="selDay=null;render()">← Volver</button>
+      <div class="city-img-info">
+        <div class="city-img-title">${d.label}</div>
+        <div class="city-img-date">${d.date}</div>
+        ${d.hotel?`<div class="city-img-hotel">🏨 ${d.hotel}</div>`:''}
+      </div>
+    </div>
+    <div style="padding:16px">${events}</div>`;
+}
+
+function renderHoteles(){
+  return `<div style="padding:16px">
+    <div class="section-title" style="padding:0 0 12px">🏨 ALOJAMIENTOS</div>
+    ${HOTELS.map(h=>`
+      <div class="hotel-card">
+        <div style="display:flex;justify-content:space-between">
+          <div>
+            <div class="hotel-name">${h.name}</div>
+            <div class="hotel-city">📍 ${h.city} — ${h.days}</div>
+            <div class="hotel-addr">📫 ${h.addr}</div>
+            ${h.phone?`<div class="hotel-phone">📞 <a href="tel:${h.phone}" style="color:#3498db">${h.phone}</a></div>`:''}
+          </div>
+        </div>
+      </div>`).join("")}
+  </div>`;
+}
+
+function renderCostos(){
+  const rows = COSTS.map(c=>`
+    <div class="cost-row">
+      <div><div class="cost-city">${c.city}</div><div class="cost-days">${c.days}</div></div>
+      <div class="cost-badge">${c.est}</div>
+    </div>`).join("");
+  const tickets = TICKETS.map(t=>`
+    <div class="ticket-row">
+      <div><div class="ticket-name">${t.name}</div><div class="ticket-url">${t.url}</div></div>
+      <div class="ticket-price">${t.price}</div>
+    </div>`).join("");
+  return `<div style="padding:16px">
+    <div class="section-title" style="padding:0 0 8px">💶 ESTIMADO ATRACCIONES POR CIUDAD</div>
+    <div class="info-box">ℹ️ Solo entradas y atracciones. No incluye vuelos, hoteles ni comidas.</div>
+    ${rows}
+    <div class="cost-total">
+      <div><div style="font-weight:700;font-size:14px">TOTAL ESTIMADO</div><div style="font-size:11px;opacity:.8">Solo atracciones y entradas</div></div>
+      <div style="font-size:22px;font-weight:900;color:#f39c12">~700–1040€</div>
+    </div>
+    <div class="section-title" style="padding:16px 0 10px">🎟️ ENTRADAS A COMPRAR ONLINE</div>
+    ${tickets}
+  </div>`;
+}
+
+function renderFrases(){
+  const data = FRASES[curLang];
+  const langBtns = Object.entries(FRASES).map(([k,v])=>`
+    <button class="lang-btn" onclick="curLang='${k}';openCat=null;render()"
+      style="border-color:${curLang===k?v.color:'#ddd'};background:${curLang===k?v.color:'#fff'};color:${curLang===k?'#fff':'#555'}">
+      ${v.label}
+    </button>`).join("");
+
+  const cats = data.cats.map((cat,ci)=>`
+    <div style="margin:0 16px 10px">
+      <button class="cat-btn ${openCat===ci?'open':''}" style="background:${data.color}" onclick="openCat=${openCat===ci?-1:ci};render()">
+        <span>${cat.cat}</span><span>${openCat===ci?'▲':'▼'}</span>
+      </button>
+      ${openCat===ci?`<div class="phrase-list">
+        ${cat.items.map((item,ii)=>`
+          <div class="phrase-item" onclick="copyPhrase('${ii}-${ci}','${item.tr.replace(/'/g,"\\'")}')">
+            <div>
+              <div class="phrase-es">${item.es}</div>
+              <div class="phrase-tr">${item.tr}</div>
+              <div class="phrase-pron" style="color:${data.color}">/${item.pron}/</div>
+            </div>
+            <span id="copy-${ii}-${ci}" style="font-size:16px;color:#bbb">📋</span>
+          </div>`).join("")}
+      </div>`:''}
+    </div>`).join("");
+
+  const nums = data.nums.map(([n,w])=>`
+    <div class="num-cell">
+      <div class="num-n" style="color:${data.color}">${n}</div>
+      <div class="num-w">${w}</div>
+    </div>`).join("");
+
+  return `<div style="padding:16px">
+    <div class="section-title" style="padding:0 0 12px">💬 FRASES ÚTILES</div>
+    <div class="lang-btns">${langBtns}</div>
+    <div class="tip-box">💡 Tocá una frase para copiarla. La pronunciación aproximada aparece en <em>cursiva</em>.</div>
+    ${cats}
+    <div style="margin:0 16px;background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+      <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:${data.color}">🔢 Números útiles</div>
+      <div class="nums-grid">${nums}</div>
+    </div>
+  </div>`;
+}
+
+function copyPhrase(id, txt){
+  navigator.clipboard?.writeText(txt).catch(()=>{});
+  const el = document.getElementById("copy-"+id);
+  if(el){ el.textContent="✅"; setTimeout(()=>{ if(el) el.textContent="📋"; },1500); }
+}
+
+function renderAlertas(){
+  const alerts = [];
+  ITINERARY.forEach(d => d.events.forEach((ev,i) => {
+    if(ev.alert) alerts.push({id:`${d.day}-${i}`,day:d.day,date:d.date,ev});
+  }));
+  const active = alerts.filter(a=>!dismissed.includes(a.id));
+  if(!active.length) return `<div style="padding:16px">
+    <div class="section-title" style="padding:0 0 12px">🔔 ALERTAS</div>
+    <div style="text-align:center;padding:40px;color:#888"><div style="font-size:40px">✅</div><div style="margin-top:8px">¡Todas las alertas revisadas!</div></div>
+    <div class="pwa-box">💡 <strong>Tip:</strong> Para instalar esta app en tu celular Android, abrila en Chrome → menú ⋮ → "Agregar a pantalla de inicio".</div>
+  </div>`;
+
+  return `<div style="padding:16px">
+    <div class="section-title" style="padding:0 0 12px">🔔 ALERTAS Y RECORDATORIOS</div>
+    ${active.slice(0,20).map(a=>`
+      <div class="alert-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="flex:1">
+            <div class="alert-day">DÍA ${a.day} · ${a.date}</div>
+            <div class="alert-title">${a.ev.type} ${a.ev.title}</div>
+            <div class="alert-detail">${a.ev.detail}</div>
+            ${a.ev.time?`<div class="alert-time">⏰ ${a.ev.time} h</div>`:''}
+          </div>
+          <button class="dismiss-btn" onclick="dismiss('${a.id}')">✓ OK</button>
+        </div>
+      </div>`).join("")}
+    <div class="pwa-box" style="margin-top:8px">💡 <strong>Tip:</strong> Para instalar esta app en Android, abrila en Chrome → menú ⋮ → "Agregar a pantalla de inicio".</div>
+  </div>`;
+}
+
+function dismiss(id){ dismissed.push(id); saveState(); render(); }
+
+function bindEvents(){ /* all inline */ }
+
+render();
+</script>
+</body>
+</html>
